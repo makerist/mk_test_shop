@@ -1,0 +1,39 @@
+docker:
+  app:
+    dockerfile:
+      - multistage
+      - alpine
+    stackfile: #compose-file.yml
+      - services # app architecture
+      - volumes  # persistence
+      - secrets  # credentials
+
+  cluster:
+    vm-provider: 'aws ?'
+    master: 3
+    worker: 4 # find out best fit
+    portainer: investigate setup and functionality
+    docker-swarm:
+      - swarm init
+      - join masters
+      - join workers
+      - rotate join tokens
+      - lock cluster
+      - docker secrets
+
+  deployment:
+    private-registry:
+      dtr: find equivalent for docker ce # Docker trusted registry
+    ci-integration:
+      - build images on commit
+      - deploy after new valid image
+    rollback:
+    scaling:
+      services:
+        manually: change replicas number and docker stack deploy
+        automatically: ???
+      workers:
+        - unlock cluster
+        - setup node
+        - join worker
+        - lock cluster
