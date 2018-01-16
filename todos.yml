@@ -1,5 +1,13 @@
 docker:
   app:
+    example-app-requirements:
+      - user with session handling (sign up / login)
+      - product with new/edit/show/index
+      - cache product's index entries
+      - (a cart / list where an user can add a product - for sql write simulation)
+      - one redis instance for sessions
+      - one redis instance for caching
+      - postgresql instance```
     dockerfile:
       - multistage
       - alpine
