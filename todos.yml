@@ -7,7 +7,7 @@ docker:
       - (a cart / list where an user can add a product - for sql write simulation)
       - one redis instance for sessions
       - one redis instance for caching
-      - postgresql instance```
+      - postgresql instance
     dockerfile:
       - multistage
       - alpine
