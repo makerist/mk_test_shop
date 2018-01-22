@@ -6,48 +6,74 @@ services:
     environment:
       POSTGRES_USER: 'mk_test_shop'
       POSTGRES_PASSWORD: 'yourpassword'
-    ports:
-      - '5432:5432'
-    volumes:
-      - 'postgres:/var/lib/postgresql/data'
+    ports:   [ '5432:5432' ]
+    volumes: [ 'postgres:/var/lib/postgresql/data' ]
 
-  redis:
+  redis_cache:
     image: 'redis:3.2-alpine'
-    command: redis-server --requirepass yourpassword
-    ports:
-      - '6379:6379'
-    volumes:
-      - 'redis:/data'
+    command: [ 'sh', '-c', 'docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_cache_password)"' ]
+    ports:   [ '6380:6379' ]
+    volumes: [ 'redis_cache:/data' ]
+    secrets: [ 'redis_cache_password' ]
+
+  redis_sessions:
+    image: 'redis:3.2-alpine'
+    command: [ 'sh', '-c', 'docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_sessions_password)"' ]
+    ports:   [ '6382:6379' ]
+    volumes: [ 'redis_sessions:/data' ]
+    secrets: [ 'redis_sessions_password' ]
+
+  redis_jobs:
+    image: 'redis:3.2-alpine'
+    command: [ 'sh', '-c', 'docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_jobs_password)"' ]
+    ports:   [ '6383:6379' ]
+    volumes: [ 'redis_jobs:/data' ]
+    secrets: [ 'redis_jobs_password' ]
 
   website:
     image: 'mk_test_shop_app'
     depends_on:
-      - 'postgres'
-      - 'redis'
-    ports:
-      - '3000:3000'
-    env_file:
-      - '.env'
+      - postgres
+      - redis_cache
+      - redis_sessions
+      - redis_jobs
+    ports: [ '3000:3000' ]
+    environment:
+      REDIS_CACHE: 'yes'
+      REDIS_CACHE_HOST: redis_cache
+      REDIS_CACHE_PORT: '6380'
+      REDIS_SESSIONS: 'yes'
+      REDIS_SESSIONS_HOST: redis_sessions
+      REDIS_SESSIONS_PORT: '6382'
+      REDIS_JOBS_HOST: redis_jobs
+      REDIS_JOBS_PORT: '6383'
+    secrets:
+      - redis_cache_password
+      - redis_sessions_password
+      - redis_jobs_password
 
   sidekiq:
     image: 'mk_test_shop_app'
     depends_on:
-      - 'postgres'
-      - 'redis'
+      - redis_jobs
+      - postgres
     command: sidekiq -C config/sidekiq.yml.erb
-    env_file:
-      - '.env'
+    environment:
+      REDIS_JOBS_HOST: redis_jobs
+      REDIS_JOBS_PORT: '6379'
+    secrets:
+      - redis_jobs_password
 
-  cable:
-    image: 'mk_test_shop_app'
-    depends_on:
-      - 'redis'
-    command: puma -p 28080 cable/config.ru
-    ports:
-      - '28080:28080'
-    env_file:
-      - '.env'
+secrets:
+  redis_cache_password:
+    external: true
+  redis_sessions_password:
+    external: true
+  redis_jobs_password:
+    external: true
 
 volumes:
-  redis:
+  redis_cache:
+  redis_sessions:
+  redis_jobs:
   postgres:

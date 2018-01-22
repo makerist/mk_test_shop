@@ -28,10 +28,16 @@ docker:
       - rotate join tokens
       - lock cluster
       - docker secrets
+      - volumes for persistence; container wide
 
   deployment:
     private-registry:
-      dtr: find equivalent for docker ce # Docker trusted registry
+      dtr: # Docker trusted registry - find equivalent for docker ce
+        aws:
+          - test AWS Elastic Container Registry
+          steps:
+            - aws ecr get-login --no-include-email
+              # paste the output to the console again to login docker to the new registry
     ci-integration:
       - build images on commit
       - deploy after new valid image

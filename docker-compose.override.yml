@@ -15,8 +15,15 @@ services:
     env_file:
       - '.env'
 
-  cable:
-    volumes:
-      - '.:/app'
-    env_file:
-      - '.env'
+#  cable:
+#    volumes:
+#      - '.:/app'
+#    env_file:
+#      - '.env'
+secrets:
+  redis_cache_password:
+    file: ./docker/secrets/redis_cache_password
+  redis_sessions_password:
+    file: ./docker/secrets/redis_sessions_password
+  redis_jobs_password:
+    file: ./docker/secrets/redis_jobs_password

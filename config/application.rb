@@ -46,20 +46,26 @@ module MkTestShop
     }
 
     # Set Redis as the back-end for the cache.
-    config.cache_store = :redis_store, ENV['REDIS_CACHE_URL']
+    # If not in sidekiq mode
+    if ENV['REDIS_CACHE'] == 'yes'
+      redis_password = Rails.application.secrets.redis_cache_password
+      redis_host     = ENV['REDIS_CACHE_HOST']
+      redis_port     = ENV['REDIS_CACHE_PORT']
+      config.cache_store = :redis_store, "redis://:#{redis_password}@#{redis_host}:#{redis_port}/0/cache"
+    end
 
     # Set Sidekiq as the back-end for Active Job.
     config.active_job.queue_adapter = :sidekiq
-    config.active_job.queue_name_prefix =
-      "#{ENV['ACTIVE_JOB_QUEUE_PREFIX']}_#{Rails.env}"
+    # config.active_job.queue_name_prefix = "#{ENV['ACTIVE_JOB_QUEUE_PREFIX']}_#{Rails.env}"
+    config.active_job.queue_name_prefix = "mk_test_shop:jobs_#{Rails.env}"
 
     # Action Cable setting to de-couple it from the main Rails process.
-    config.action_cable.url = ENV['ACTION_CABLE_FRONTEND_URL']
+    # config.action_cable.url = ENV['ACTION_CABLE_FRONTEND_URL']
 
     # Action Cable setting to allow connections from these domains.
-    origins = ENV['ACTION_CABLE_ALLOWED_REQUEST_ORIGINS'].split(',')
-    origins.map! { |url| /#{url}/ }
-    config.action_cable.allowed_request_origins = origins
+    # origins = ENV['ACTION_CABLE_ALLOWED_REQUEST_ORIGINS'].split(',')
+    # origins.map! { |url| /#{url}/ }
+    # config.action_cable.allowed_request_origins = origins
   end
 end
 
