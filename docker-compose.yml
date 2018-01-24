@@ -2,36 +2,38 @@ version: '3.4'
 
 services:
   postgres:
-    image: 'postgres:9.6-alpine'
+    image: postgres:9.6-alpine
     environment:
-      POSTGRES_USER: 'mk_test_shop'
-      POSTGRES_PASSWORD: 'yourpassword'
+      POSTGRES_USER: mk_test_shop
+      POSTGRES_DB:   mk_test_shop
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     ports:   [ '5432:5432' ]
     volumes: [ 'postgres:/var/lib/postgresql/data' ]
+    secrets: [ postgres_password ]
 
   redis_cache:
     image: 'redis:3.2-alpine'
-    command: [ 'sh', '-c', 'docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_cache_password)"' ]
+    command: [ sh, -c, docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_cache_password)" ]
     ports:   [ '6380:6379' ]
     volumes: [ 'redis_cache:/data' ]
-    secrets: [ 'redis_cache_password' ]
+    secrets: [ redis_cache_password ]
 
   redis_sessions:
     image: 'redis:3.2-alpine'
-    command: [ 'sh', '-c', 'docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_sessions_password)"' ]
+    command: [ sh, -c, docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_sessions_password)" ]
     ports:   [ '6382:6379' ]
     volumes: [ 'redis_sessions:/data' ]
-    secrets: [ 'redis_sessions_password' ]
+    secrets: [ redis_sessions_password ]
 
   redis_jobs:
     image: 'redis:3.2-alpine'
-    command: [ 'sh', '-c', 'docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_jobs_password)"' ]
-    ports:   [ '6383:6379' ]
+    command: [ sh, -c, docker-entrypoint.sh --requirepass "$$(cat /run/secrets/redis_jobs_password)" ]
+    ports:   [ '6379:6379' ]
     volumes: [ 'redis_jobs:/data' ]
-    secrets: [ 'redis_jobs_password' ]
+    secrets: [ redis_jobs_password ]
 
   website:
-    image: 'mk_test_shop_app'
+    image: mk_test_shop_app
     depends_on:
       - postgres
       - redis_cache
@@ -39,32 +41,32 @@ services:
       - redis_jobs
     ports: [ '3000:3000' ]
     environment:
-      REDIS_CACHE: 'yes'
-      REDIS_CACHE_HOST: redis_cache
-      REDIS_CACHE_PORT: '6380'
-      REDIS_SESSIONS: 'yes'
-      REDIS_SESSIONS_HOST: redis_sessions
-      REDIS_SESSIONS_PORT: '6382'
-      REDIS_JOBS_HOST: redis_jobs
-      REDIS_JOBS_PORT: '6383'
+      POSTGRES_URL: postgresql://mk_test_shop@postgres:5432/mk_test_shop?encoding=utf8&pool=5&timeout=5000
+      REDIS_CACHE_URL:    redis://:@redis_cache:6380/0/cache
+      REDIS_SESSIONS_URL: redis://:@redis_sessions:6382/0/sessions
+      REDIS_JOBS_URL:     redis://:@redis_jobs:6379/0/jobs
     secrets:
+      - postgres_password
       - redis_cache_password
       - redis_sessions_password
       - redis_jobs_password
 
   sidekiq:
-    image: 'mk_test_shop_app'
+    image: mk_test_shop_app
     depends_on:
       - redis_jobs
       - postgres
     command: sidekiq -C config/sidekiq.yml.erb
     environment:
-      REDIS_JOBS_HOST: redis_jobs
-      REDIS_JOBS_PORT: '6379'
+      POSTGRES_URL: postgresql://mk_test_shop@postgres:5432/mk_test_shop?encoding=utf8&pool=5&timeout=5000
+      REDIS_JOBS_URL: redis://:@redis_jobs:6379/0/jobs
     secrets:
+      - postgres_password
       - redis_jobs_password
 
 secrets:
+  postgres_password:
+    external: true
   redis_cache_password:
     external: true
   redis_sessions_password:

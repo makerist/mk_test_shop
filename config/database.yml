@@ -1,13 +1,16 @@
 ---
 
-development:
-  url: <%= ENV['DATABASE_URL'].gsub('?', '_development?') %>
+<% uri = URI(ENV['POSTGRES_URL']) %>
+<% uri.password = Rails.application.secrets.postgres_password %>
+
+development: &default
+  url: <%= uri.to_s %>
 
 test:
-  url: <%= ENV['DATABASE_URL'].gsub('?', '_test?') %>
+  <<: *default
 
 staging:
-  url: <%= ENV['DATABASE_URL'].gsub('?', '_staging?') %>
+  <<: *default
 
 production:
-  url: <%= ENV['DATABASE_URL'].gsub('?', '_production?') %>
+  <<: *default

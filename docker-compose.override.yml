@@ -15,12 +15,9 @@ services:
     env_file:
       - '.env'
 
-#  cable:
-#    volumes:
-#      - '.:/app'
-#    env_file:
-#      - '.env'
 secrets:
+  postgres_password:
+    file: ./docker/secrets/postgres_password
   redis_cache_password:
     file: ./docker/secrets/redis_cache_password
   redis_sessions_password:

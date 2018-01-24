@@ -47,11 +47,10 @@ module MkTestShop
 
     # Set Redis as the back-end for the cache.
     # If not in sidekiq mode
-    if ENV['REDIS_CACHE'] == 'yes'
-      redis_password = Rails.application.secrets.redis_cache_password
-      redis_host     = ENV['REDIS_CACHE_HOST']
-      redis_port     = ENV['REDIS_CACHE_PORT']
-      config.cache_store = :redis_store, "redis://:#{redis_password}@#{redis_host}:#{redis_port}/0/cache"
+    if ENV['REDIS_CACHE_URL'].present?
+      uri = URI(ENV['REDIS_CACHE_URL'])
+      uri.password = Rails.application.secrets.redis_cache_password
+      config.cache_store = :redis_store, uri.to_s
     end
 
     # Set Sidekiq as the back-end for Active Job.

@@ -2,11 +2,9 @@
 
 # Rails.application.config.session_store :cookie_store, key: '_mk_test_shop_session'
 
-if ENV['REDIS_SESSION'] == 'yes'
-  redis_password = Rails.application.secrets.redis_session_password
-  redis_host     = ENV['REDIS_SESSION_HOST']
-  redis_port     = ENV['REDIS_SESSION_PORT']
-  redis_url      = "redis://:#{redis_password}@#{redis_host}:#{redis_port}/0/session"
+if ENV['REDIS_SESSION_URL'].present?
+  uri = URI(ENV['REDIS_SESSION_URL'])
+  uri.password = Rails.application.secrets.redis_session_password
 
-  Rails.application.config.session_store :redis_store, servers: [redis_url]
+  Rails.application.config.session_store :redis_store, servers: [uri.to_s]
 end
