@@ -2,19 +2,22 @@ docker:
   app:
     example-app-requirements:
       - user with session handling (sign up / login)
-      - product with new/edit/show/index
-      - cache product's index entries
-      - (a cart / list where an user can add a product - for sql write simulation)
-      - one redis instance for sessions
-      - one redis instance for caching
-      - postgresql instance
+      - ✓ product with new/edit/show/index
+      - ✓ cache product's index entries
+      -   (a cart / list where an user can add a product - for sql write simulation)
+      - ✓ one redis instance for sessions
+      - ✓ one redis instance for caching
+      - ✓ one redis instance for sidekiq jobs
+      - ✓ postgresql instance
     dockerfile:
-      - multistage
-      - alpine
+      -   multistage
+      - ✓ alpine
     stackfile: #compose-file.yml
-      - services # app architecture
-      - volumes  # persistence
-      - secrets  # credentials
+      services: ✓ # app architecture
+      volumes: # persistence
+        define: ✓
+        network_storage: ?
+      secrets: ✓  # credentials
 
   cluster:
     vm-provider: 'aws ?'

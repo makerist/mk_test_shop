@@ -55,7 +55,6 @@ module MkTestShop
 
     # Set Sidekiq as the back-end for Active Job.
     config.active_job.queue_adapter = :sidekiq
-    # config.active_job.queue_name_prefix = "#{ENV['ACTIVE_JOB_QUEUE_PREFIX']}_#{Rails.env}"
     config.active_job.queue_name_prefix = "mk_test_shop:jobs_#{Rails.env}"
 
     # Action Cable setting to de-couple it from the main Rails process.

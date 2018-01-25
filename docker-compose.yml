@@ -45,7 +45,14 @@ services:
       REDIS_CACHE_URL:    redis://:@redis_cache:6380/0/cache
       REDIS_SESSIONS_URL: redis://:@redis_sessions:6382/0/sessions
       REDIS_JOBS_URL:     redis://:@redis_jobs:6379/0/jobs
+      BIND_ON: '0.0.0.0:3000'
+      PUMA_RAILS_MAX_THREADS: 3
+      PUMA_WEB_CONCURRENCY: 5
+      RACK_REQUEST_TIMEOUT: 30
+      RAILS_ENV: production
+      LOG_LEVEL: warn # Rails log level. Accepted values: debug, info, warn, error, fatal, or unknown
     secrets:
+      - rails_secret_token
       - postgres_password
       - redis_cache_password
       - redis_sessions_password
@@ -65,6 +72,8 @@ services:
       - redis_jobs_password
 
 secrets:
+  rails_secret_token:
+    external: true
   postgres_password:
     external: true
   redis_cache_password:

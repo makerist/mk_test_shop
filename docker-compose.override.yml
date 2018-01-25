@@ -6,16 +6,24 @@ services:
     build: .
     volumes:
       - '.:/app'
-    env_file:
-      - '.env'
+    environment:
+      BIND_ON: '0.0.0.0:3000'
+      PUMA_RAILS_MAX_THREADS: 1
+      PUMA_WEB_CONCURRENCY: 1
+      RACK_REQUEST_TIMEOUT: 30
+      RAILS_ENV: development
+      LOG_LEVEL: debug # Rails log level: debug, info, warn, error, fatal, or unknown
 
   sidekiq:
     volumes:
       - '.:/app'
-    env_file:
-      - '.env'
+    environment:
+      RAILS_ENV: development
+      LOG_LEVEL: debug
 
 secrets:
+  rails_secret_token:
+    file: ./docker/secrets/rails_secret_token
   postgres_password:
     file: ./docker/secrets/postgres_password
   redis_cache_password:
