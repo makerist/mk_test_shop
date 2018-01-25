@@ -1,7 +1,6 @@
 version: '3.4'
 
 services:
-
   website:
     build: .
     volumes:
@@ -21,14 +20,15 @@ services:
       RAILS_ENV: development
       LOG_LEVEL: debug
 
-secrets:
-  rails_secret_token:
-    file: ./docker/secrets/rails_secret_token
-  postgres_password:
-    file: ./docker/secrets/postgres_password
-  redis_cache_password:
-    file: ./docker/secrets/redis_cache_password
-  redis_sessions_password:
-    file: ./docker/secrets/redis_sessions_password
-  redis_jobs_password:
-    file: ./docker/secrets/redis_jobs_password
+
+#secrets:
+#  rails_secret_token:
+#    file: ./docker/secrets/rails_secret_token
+#  postgres_password:
+#    file: ./docker/secrets/postgres_password
+#  redis_cache_password:
+#    file: ./docker/secrets/redis_cache_password
+#  redis_sessions_password:
+#    file: ./docker/secrets/redis_sessions_password
+#  redis_jobs_password:
+#    file: ./docker/secrets/redis_jobs_password

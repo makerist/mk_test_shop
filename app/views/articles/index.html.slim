@@ -1,23 +1,18 @@
-h1 Listing articles
+h1 Articles
 
-table
-  thead
-    tr
-      th Title
-      th Price
-      th
-      th
-      th
+.row
+  .col-md-9
 
-  tbody
-    - @articles.each do |article|
-      tr
-        td = article.title
-        td = article.price
-        td = link_to 'Show', article
-        td = link_to 'Edit', edit_article_path(article)
-        td = link_to 'Destroy', article, data: { confirm: 'Are you sure?' }, method: :delete
+    table.table
+      thead
+        tr
+          th Title
+          th Price
 
-br
-
-= link_to 'New Article', new_article_path
+      tbody
+        - @articles.each do |article|
+          tr
+            td = link_to article.title, article
+            td = article.price
+  .col-md-3
+    = link_to 'New Article', new_article_path, class: 'btn btn-primary'
